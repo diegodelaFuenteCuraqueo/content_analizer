@@ -39,4 +39,4 @@ function hmsToSeconds(time) {
   return (parseInt(parts[0]) * 3600) + (parseInt(parts[1]) * 60) + parseInt(parts[2])
 }
 
-module.exports = {detectSilences}
+module.exports = {detectSilences, hmsToSeconds}

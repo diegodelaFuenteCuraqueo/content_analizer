@@ -1,7 +1,4 @@
-const { spawn } = require('child_process')
-const ffmpeg = require('fluent-ffmpeg')
-
-const audioAnalizer = require('./audioAnalizer')
+const { exec } = require('child_process')
 
 const detectScenes = (media) => {
   console.log(" DETECTSCENES ")
@@ -16,28 +13,15 @@ const detectScenes = (media) => {
     //"-o",
     //"output/"
   ]
+  console.log(cmd.join(' '))
   return runCommand(`scenedetect ${cmd.join(' ')}`)
-
-  //const scenedetect = spawn('scenedetect', cmd)
-
-  //scenedetect.stdout.on('data', (data) => {
-  //  console.log(`stdout: ${data}`)
-  //})
-
-  //scenedetect.stderr.on('data', (data) => {
-  //  console.error(`stderr: ${data}`)
-  //})
-
-  //scenedetect.on('close', (code) => {
-  //  console.log(`child process exited with code ${code}`)
-  //})
 }
-
 
 function runCommand(command) {
   return new Promise((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
       if (error) {
+        console.log("ERROR")
         reject(error);
         return;
       }
@@ -46,4 +30,4 @@ function runCommand(command) {
   });
 }
 
-module.exports = {detectScenes}
+module.exports = {detectScenes, runCommand}
