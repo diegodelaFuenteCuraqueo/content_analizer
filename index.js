@@ -22,9 +22,10 @@ ffmpeg.ffprobe(videoFilePath, (err, metadata) => {
   media.startSegment =  duration > 10 ? 5 : 0
   media.endSegment = duration > 10 ? duration - 5 : duration
 
-  //videoAnalizer.detectScenes(media)
-  const audioAnalisys = audioAnalizer.detectSilences(media)
-  console.log(audioAnalisys)
+  videoAnalizer.detectScenes(media)
 })
+
+const audioAnalisys = await audioAnalizer.detectSilences(media)
+console.log(audioAnalisys)
 
 //console.log(media)

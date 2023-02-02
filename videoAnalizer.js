@@ -5,7 +5,7 @@ const audioAnalizer = require('./audioAnalizer')
 
 const detectScenes = (media) => {
   console.log(" DETECTSCENES ")
-  const scenedetect = spawn('scenedetect', [
+  const cmd = [
     '-i',
     media.path,
     'time', '--start', `${media.startSegment}s`, '--end', `${media.endSegment}s`,
@@ -15,19 +15,35 @@ const detectScenes = (media) => {
     'list-scenes',
     //"-o",
     //"output/"
-  ])
+  ]
+  return runCommand(`scenedetect ${cmd.join(' ')}`)
 
-  scenedetect.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`)
-  })
+  //const scenedetect = spawn('scenedetect', cmd)
 
-  scenedetect.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`)
-  })
+  //scenedetect.stdout.on('data', (data) => {
+  //  console.log(`stdout: ${data}`)
+  //})
 
-  scenedetect.on('close', (code) => {
-    console.log(`child process exited with code ${code}`)
-  })
+  //scenedetect.stderr.on('data', (data) => {
+  //  console.error(`stderr: ${data}`)
+  //})
+
+  //scenedetect.on('close', (code) => {
+  //  console.log(`child process exited with code ${code}`)
+  //})
+}
+
+
+function runCommand(command) {
+  return new Promise((resolve, reject) => {
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(stdout);
+    });
+  });
 }
 
 module.exports = {detectScenes}
