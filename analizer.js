@@ -1,7 +1,7 @@
-const ffmpeg = require('fluent-ffmpeg')
-
 const audioAnalizer = require('./audioAnalizer')
 const command = require('./runCommand')
+
+const ffmpeg = require('fluent-ffmpeg')
 
 let media = {}
 
@@ -17,7 +17,7 @@ function runFfprobe(inputFile) {
   })
 }
 
-function analyzeMedia(videoFilePath) {
+async function analyseMedia(videoFilePath) {
   media = {}
   runFfprobe(videoFilePath)
     .then(data => {
@@ -30,13 +30,13 @@ function analyzeMedia(videoFilePath) {
       return media
     })
     .then(async data => {
-      console.log(" AUDIOANALISYS ", data)
+      console.log(" AUDIOANALISYS ")
       const audioAnalisys = await audioAnalizer.detectSilences(data)
       media.audioSpots = audioAnalisys
       return data
     })
     .then(async data => {
-      console.log(" DETECTSCENES ", data)
+      console.log(" DETECTSCENES ")
       let videoAnalisys
       const cmd = [
         'scenedetect',
@@ -63,9 +63,9 @@ function analyzeMedia(videoFilePath) {
       return media
     })
     .catch(error => {
-      console.error(error);
-    });
+      console.error(error)
+    })
   return media
 }
 
-module.exports = {analyzeMedia}
+module.exports = {analyseMedia}

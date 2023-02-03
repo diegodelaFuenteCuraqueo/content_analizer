@@ -1,7 +1,7 @@
 const { spawn } = require('child_process')
 
-let dbThreshold = -70
-let timeThreshold = 0.5
+let dbThreshold = -90
+let timeThreshold = 3
 
 function detectSilences (media) {
   const silences = []
@@ -9,8 +9,8 @@ function detectSilences (media) {
     'ffmpeg',
     [
       '-i', media.path,
-      '-ss', secToHHMMSS(media.startSegment),
-      '-to', secToHHMMSS(media.endSegment),
+      //'-ss', secToHHMMSS(media.startSegment),
+      //'-to', secToHHMMSS(media.endSegment),
       '-af', `silencedetect=n=${dbThreshold}dB:d=${timeThreshold}`,
       '-f', 'null',
       '-y', 'pipe:1'
@@ -25,6 +25,7 @@ function detectSilences (media) {
     if(parsed.includes("frame=")){
       const timeHMS = parsed.find((element) => element.includes("time=")).slice(5)
       silences.push(hmsToSeconds(timeHMS))
+      console.log("silence at", timeHMS, hmsToSeconds(timeHMS) )
     }
   })
 
@@ -33,7 +34,7 @@ function detectSilences (media) {
   })
 
   return new Promise((resolve, reject) => {
-      resolve(silences);
+    resolve(silences);
   });
 }
 
@@ -47,15 +48,10 @@ function secToHHMMSS(seconds) {
   let minutes = Math.floor((seconds - (hours * 3600)) / 60)
   let secs = Math.floor(seconds - (hours * 3600) - (minutes * 60))
 
-  if (hours < 10) {
-    hours = "0" + hours
-  }
-  if (minutes < 10) {
-    minutes = "0" + minutes
-  }
-  if (secs < 10) {
-    secs = "0" + secs
-  }
+  hours = hours < 10 ? '0' + hours : hours
+  minutes = minutes < 10 ? '0' + minutes : minutes
+  secs = secs < 10 ? '0' + secs : secs
+
   return hours + ':' + minutes + ':' + secs
 }
 
