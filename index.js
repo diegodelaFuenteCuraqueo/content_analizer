@@ -4,8 +4,11 @@ const fs = require('fs')
 const expressFileUpload = require('express-fileupload')
 const app = express()
 const bodyParser = require('body-parser')
+const http = require('http');
+const server = http.createServer(app)
+const path = require("path");
 
-const videoFilePath = "../dance.mp4"
+let mediaData = {}
 
 // using bodyparser: x-www-form-urlencoded, json
 app.use(bodyParser.urlencoded({extended:false}))
@@ -14,7 +17,7 @@ app.use(bodyParser.json())
 // main route
 app.get('/', (req,res)=>{
   console.log(" ~ accediendo a /")
-  return res.sendFile(__dirname + '/index.html')
+  return res.sendFile(__dirname + '/analisys.html')
 })
 
 app.use(
@@ -24,12 +27,11 @@ app.use(
   })
 )
 
-// index.html convert form
-app.post('/convert', (req,res)=>{
-  console.log(" ~ accediendo a /convert")
+app.post('/analyse', async (req,res) => {
+  console.log(" ~ accediendo a /analyse")
+  mediaData = {}
   let to = req.body.to
   let file = req.files.file
-   // console.log(to)
   console.log('file', file)
 
   file.mv("tmp/" + file.name, (err) => {
@@ -37,10 +39,19 @@ app.post('/convert', (req,res)=>{
     console.log("archivo subido correctamente")
   })
 
-  analyseMedia("tmp/" + file.name).then((_data) => {
-    data = _data
-    console.log("DATA", data)
+  await analyseMedia("tmp/" + file.name).then((_data) => {
+    mediaData = _data
+    console.log("DATA", mediaData)
+    //return res.sendFile(__dirname + '/analisys.html')
   })
+  return
+})
+
+app.get('/analysedContent', (req,res)=>{
+  console.log(" ~ accediendo a /analysedContent")
+  _mediaData = Object.assign({}, mediaData)
+  console.log(_mediaData)
+  return res.json(_mediaData)
 })
 
 const port = process.env.PORT || 9090

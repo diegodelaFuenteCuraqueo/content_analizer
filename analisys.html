@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <title>Automarkers</title>
+</head>
+<body>
+  <div class="container">
+    <h1 style="text-align=center;">Automarkers</h1>
+    <form action="/analyse" method="post" enctype="multipart/form-data" onsubmit="jsFunction();return false">
+    <div class="form-group">
+      <input type="file" name="file" id="file"/>
+    </div>
+    <br />
+    <div class="form-group">
+      <button class="btn btn-danger btn-block">
+      Analizar
+      </button>
+      </div>
+    </div>
+    </form>
+  </div>
+
+  <video id="video" width="100%"></video>
+  <div id="data">
+    <table width="100%">
+      <tr>
+        <th>Duration</th>
+        <th>Scene Spots</th>
+        <th>Audio Spots</th>
+      </tr>
+      <tr>
+        <td id="duration"></td>
+        <td id="sceneSpots"></td>
+        <td id="audioSpots"></td>
+      </tr>
+    </table>
+  </div>
+
+  <div id="marker" class="container" style="border:1px solid gray;">
+    <div class="row">
+      <div class="col-md-6" id="sceneMarker">
+        <h3>Scene</h3>
+        <div id="scene"></div>
+      </div>
+      <div class="col-md-6" id="audioMarker">
+        <h3>Audio</h3>
+        <div id="audio"></div>
+      </div>
+  </div>
+
+  <script>
+
+    const input = document.getElementById("file")
+    const btn = document.querySelector("button")
+    const video = document.getElementById('video')
+    const auMarker = document.getElementById('audioMarker')
+    const scMarker = document.getElementById('sceneMarker')
+
+    input.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      window.mediaUrl = URL.createObjectURL(file);
+      console.log("input change:",window.mediaUrl, file)
+      video.src = window.mediaUrl
+    });
+
+    btn.addEventListener("click", (event) => {
+      console.log("button click:",window.mediaUrl)
+      //event.preventDefault()
+    });
+
+    video.addEventListener("timeupdate",
+      (event) => {
+        const currentTime = parseInt(event.srcElement.currentTime)
+        if(mediaData.sceneSpots.includes(currentTime)) {
+          scMarker.style.backgroundColor = "blue"
+        } else {
+          scMarker.style.backgroundColor = ""
+        }
+        if(mediaData.audioSpots.includes(currentTime)) {
+          auMarker.style.backgroundColor = "green"
+        } else {
+          auMarker.style.backgroundColor = ""
+        }
+      }
+    )
+
+    let mediaData = {}
+
+    const interval = setInterval(()=>{
+      console.log("fetching...")
+      fetch('/analysedContent')
+      .then(response => response.json())
+      .then(data => {
+        mediaData = data
+        console.log(data)
+        if(mediaData.hasOwnProperty('sceneSpots') && mediaData.hasOwnProperty('audioSpots')) {
+          console.log("clearing interval")
+          activateTimeline()
+          clearInterval(interval)
+        }
+      })
+    }, 1000)
+
+    function activateTimeline() {
+      console.log(window.mediaUrl )
+      video.src = window.mediaUrl //'localhost:9090/'+mediaData.video
+      video.controls = true
+      video.autoplay = true
+      video.loop = true
+      video.muted = true
+      video.play()
+
+      const sceneSpots = document.getElementById('sceneSpots')
+      const audioSpots = document.getElementById('audioSpots')
+      const duration = document.getElementById('duration')
+      sceneSpots.innerHTML = mediaData.sceneSpots
+      audioSpots.innerHTML = mediaData.audioSpots
+      duration.innerHTML = mediaData.duration
+    }
+
+
+
+  </script>
+</body>
+</html>
