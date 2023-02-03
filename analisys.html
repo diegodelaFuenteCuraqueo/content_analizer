@@ -7,22 +7,37 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-  <title>Automarkers</title>
+  <title>SS detector</title>
 </head>
 <body>
   <div class="container">
-    <h1 style="text-align=center;">Automarkers</h1>
-    <form action="/analyse" method="post" enctype="multipart/form-data" onsubmit="jsFunction();return false">
-    <div class="form-group">
-      <input type="file" name="file" id="file"/>
-    </div>
-    <br />
-    <div class="form-group">
-      <button class="btn btn-danger btn-block">
-      Analizar
-      </button>
+    <h1 style="text-align:center;">Scene+Silence detector</h1>
+    <form action="/analyse" method="post" enctype="multipart/form-data">
+      <div class="form-group">
+        <input type="file" name="file" id="file"/>
       </div>
-    </div>
+
+      <div>
+        <label for="sceneThreshold">SceneDetect Threshold</label>
+        <input type="number" name="sceneThreshold" id="sceneThreshold" value="55" />
+      </div>
+
+      <div>
+        <label for="silenceThreshold">SilenceDetect db Threshold</label>
+        <input type="number" name="silenceThreshold" id="silenceThreshold" value="-70" />
+      </div>
+
+      <div>
+        <label for="timeThreshold">SilenceDetect time Threshold (seconds)</label>
+        <input type="number" name="timeThreshold" id="timeThreshold" value="3" />
+      </div>
+
+      <br />
+      <div class="form-group">
+        <button class="btn btn-danger btn-block">
+          Analizar
+        </button>
+      </div>
     </form>
   </div>
 
@@ -30,13 +45,16 @@
   <div id="data">
     <table width="100%">
       <tr>
-        <th>Duration</th>
-        <th>Scene Spots</th>
-        <th>Audio Spots</th>
       </tr>
       <tr>
+        <td>Duration</td>
         <td id="duration"></td>
+      <tr>
+        <td>Scene Spots</td>
         <td id="sceneSpots"></td>
+      </tr>    
+      <tr>
+        <td>Audio Spots</td>
         <td id="audioSpots"></td>
       </tr>
     </table>
@@ -123,9 +141,6 @@
       audioSpots.innerHTML = mediaData.audioSpots
       duration.innerHTML = mediaData.duration
     }
-
-
-
   </script>
 </body>
 </html>

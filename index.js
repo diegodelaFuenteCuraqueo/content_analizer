@@ -4,9 +4,7 @@ const fs = require('fs')
 const expressFileUpload = require('express-fileupload')
 const app = express()
 const bodyParser = require('body-parser')
-const http = require('http');
-const server = http.createServer(app)
-const path = require("path");
+const http = require('http')
 
 let mediaData = {}
 
@@ -28,9 +26,9 @@ app.use(
 )
 
 app.post('/analyse', async (req,res) => {
-  console.log(" ~ accediendo a /analyse")
+  console.log(" ~ accediendo a /analyse", req.body)
   mediaData = {}
-  let to = req.body.to
+
   let file = req.files.file
   console.log('file', file)
 
@@ -39,10 +37,10 @@ app.post('/analyse', async (req,res) => {
     console.log("archivo subido correctamente")
   })
 
-  await analyseMedia("tmp/" + file.name).then((_data) => {
+  await analyseMedia("tmp/" + file.name, req.body).then((_data) => {
     mediaData = _data
     console.log("DATA", mediaData)
-    //return res.sendFile(__dirname + '/analisys.html')
+    return
   })
   return
 })

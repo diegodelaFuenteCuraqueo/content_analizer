@@ -3,7 +3,7 @@ const { spawn } = require('child_process')
 let dbThreshold = -90
 let timeThreshold = 3
 
-function detectSilences (media) {
+function detectSilences (media, config = {}) {
   const silences = []
   var ffmpegSilenceDetector = spawn(
     'ffmpeg',
@@ -11,7 +11,7 @@ function detectSilences (media) {
       '-i', media.path,
       //'-ss', secToHHMMSS(media.startSegment),
       //'-to', secToHHMMSS(media.endSegment),
-      '-af', `silencedetect=n=${dbThreshold}dB:d=${timeThreshold}`,
+      '-af', `silencedetect=n=${config.silenceThreshold || dbThreshold}dB:d=${config.timeThreshold || timeThreshold}`,
       '-f', 'null',
       '-y', 'pipe:1'
     ]

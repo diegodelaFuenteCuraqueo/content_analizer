@@ -17,7 +17,7 @@ function runFfprobe(inputFile) {
   })
 }
 
-async function analyseMedia(videoFilePath) {
+async function analyseMedia(videoFilePath, config = {}) {
   media = {}
   runFfprobe(videoFilePath)
     .then(data => {
@@ -31,7 +31,7 @@ async function analyseMedia(videoFilePath) {
     })
     .then(async data => {
       console.log(" AUDIOANALISYS ")
-      const audioAnalisys = await audioAnalizer.detectSilences(data)
+      const audioAnalisys = await audioAnalizer.detectSilences(data, config.audioDetect || {})
       media.audioSpots = audioAnalisys
       return data
     })
@@ -44,12 +44,13 @@ async function analyseMedia(videoFilePath) {
         data.path,
         'time', '--start', `${data.startSegment}s`, '--end', `${data.endSegment}s`,
         'detect-content',
-        '--threshold', '55'//,
+        '--threshold', config.sceneThreshold || '55'//,
         //'save-images',
         //'list-scenes',
         //"-o",
         //"output/"
       ]
+      console.log("runing", cmd.join(" "))
       await command.runCommand(cmd.join(" "))
         .then((analisysData) => {
           lines = analisysData.split("\n")
