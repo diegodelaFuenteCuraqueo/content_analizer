@@ -1,0 +1,6 @@
+version: '2.2'
+services:
+  converter:
+    build: .
+    ports:
+      - "9090:9090"
